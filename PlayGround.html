@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Task Tracker</title>
+  </head>
+  <body>
+    <h1>Task Tracker</h1>
+    <input type="text" id="taskTitle" placeholder="Add a new task title" />
+    <input
+      type="text"
+      id="taskDescription"
+      placeholder="Add a new task description"
+    />
+    <button id="addTaskButton">Add Task</button>
+    <ul id="taskList"></ul>
+
+    <script>
+      class Task {
+        constructor(title, description) {
+          this.title = title;
+          this.description = description;
+          this.completed = false;
+        }
+      }
+
+      class TaskList {
+        constructor() {
+          this.tasks = [];
+        }
+
+        addTask(title, description) {
+          const newTask = new Task(title, description);
+          this.tasks.push(newTask);
+        }
+
+        removeTask(index) {
+          if (index >= 0 && index < this.tasks.length) {
+            this.tasks.splice(index, 1);
+          }
+        }
+
+        taskStatus(index) {
+          if (index >= 0 && index < this.tasks.length) {
+            this.tasks[index].completed = !this.tasks[index].completed;
+          }
+        }
+
+        render() {
+          const taskList = document.getElementById("taskList");
+          taskList.innerHTML = "";
+
+          this.tasks.forEach((task, index) => {
+
+            const listItem = document.createElement("li");
+            listItem.innerHTML = `
+                        <input type="checkbox" id="task${index}" ${task.completed ? 'checked' : ''}/
+                        <label for="task${index}" >${task.title}</label>
+                        <label for="task${index}">${task.description}</label>
+                        <button onclick="removeTask(${index})">Remove</button>`;
+
+            listItem.querySelector("input").addEventListener("change", () => {
+              this.taskStatus(index);
+              this.render();
+            });
+            taskList.appendChild(listItem);
+          });
+        }
+      }
+
+      const tasklist = new TaskList();
+
+      function addTask() {
+        const taskTitleInput = document.getElementById("taskTitle");
+        const taskDescriptionInput = document.getElementById("taskDescription");
+
+        const taskTitle = taskTitleInput.value.trim();
+        const taskDescription = taskDescriptionInput.value.trim();
+
+        if (taskTitle && taskDescription) {
+          // Assuming taskList is a defined object with an addTask method
+          tasklist.addTask(taskTitle, taskDescription);
+          tasklist.render();
+
+          taskTitleInput.value = "";
+          taskDescriptionInput.value = "";
+        }
+      }
+      console.log(addTask())
+
+      function removeTask(index) {
+        tasklist.removeTask(index);
+        tasklist.render();
+      }
+
+      document
+        .getElementById("addTaskButton")
+        .addEventListener("click", addTask);
+      tasklist.render();
+    </script>
+  </body>
+</html>
